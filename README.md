@@ -1,4 +1,4 @@
-# Key Ceremony Scripts
+# Ceremony Automation Tool: CAT
 
 Scripts and configuration files to automate PKI key ceremonies using [HashiCorp Vault](https://www.vaultproject.io/).
 
