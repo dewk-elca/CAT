@@ -1,0 +1,127 @@
+ceremony: 
+    vault:
+        create: true
+        secret_shares: 2
+        secret_threshold: 2
+        name: mockcompany-pki-vault
+        new_root_token: true
+        qr_secret: true
+
+    roots:
+      - mount:
+            vault_mount_path_name: testing_mount_root_1
+            vault_mount_description: "Mount used for testing_params"
+            vault_mount_default_lease_ttl: 87600h
+            crl:
+                expiry: 87600h
+                distribution_points: "http://mockcompany-root.com/crl"
+            keypair:
+                key_name: mockcompanynet-root-1
+                key_type: ec 
+                key_bits: 384
+
+        certificate:
+            common_name: "This is my Common name"
+            alt_names: altname1,altname2,altname3
+            ip_sans: 123.1.1.1,123.1.1.2
+            uri_sans: https://ca.mockcompany.ch/intermediate,ldap://directory.mockcompany.ch/cn=intermediate-ca
+            other_sans: 1.2.840.113549.1.9.1;UTF8:ca-admin@mockcompany.ch,1.2.840.113549.1.9.1;UTF8:ca-admin@mockcompany.ch
+            # ttl: 315360000 #in seconds 
+            max_path_length: -1
+            key_usage: 
+                - DigitalSignature
+                # - ContentCommitment
+                # - KeyEncipherment
+                # - DataEncipherment
+                # - KeyAgreement
+                - CertSign
+                - CRLSign
+                # - EncipherOnly
+                # - DecipherOnly
+            permitted_dns_domains: permitteddomain1,permitteddomain2,permitteddomain3
+            excluded_dns_domains: excludeddomain1,excludeddomain2
+            permitted_ip_ranges: 192.0.2.0/24,192.0.2.1/24
+            excluded_ip_ranges: 192.0.2.2/24,192.0.2.3/24
+            permitted_email_addresses: permitted@email.com
+            excluded_email_addresses: excluded@email.com
+            permitted_uri_domains: permitteduridomain1
+            excluded_uri_domains: excludeduridomain1
+            ou: "OUOUOUO" 
+            organization: "Orginazation"  
+            country: "Country"  
+            locality: "Locality" 
+            province: "Province"  
+            street_address: "Street Addy" 
+            postal_code: "1919191" 
+            not_before_duration: 5m
+            not_after: "2035-12-31T23:59:59Z" # Always UTC format expected.
+        
+        
+
+    intermediates:
+      - vault_signing_mount_path_name: testing_mount_root_1
+
+        ## Comment out if csr.path is set.
+        # mount:
+        #     vault_mount_path_name: testing_mount_int_1
+        #     vault_mount_description: "Mount used for mockcompany's PKI, intermediate-1"
+        #     vault_mount_default_lease_ttl: 87600h
+        #     crl:
+        #         expiry: 87600h
+        #         distribution_points: "http://mockcompany-int1.com/crl"
+        #     issuing_certificates: "http://mockcompany-int1.com/issuers"
+        #     keypair:
+        #         key_name: mockcompanynet-int-1
+        #         key_type: ec 
+        #         key_bits: 384
+
+        csr: 
+            ##### Comment out if you wish to generate a CSR #####
+            expected_filename: mockcompanydevintcatst.mockcompanyDev.local.req
+
+            ##### Do not comment out the common name #####
+            common_name: "mockcompany DEV Intermediate Issuing CA TEST"
+            
+            ##### Used as a check instead of generation if csr is passed. CSR values are always prioritised #####
+            ##### If any values are missing in the csr which are listed here, they will be included in the cert #####
+            # alt_names: altname1,altname2,altname3
+            # ip_sans: 123.1.1.1,123.1.1.2
+            # uri_sans: https://ca.mockcompany.ch/intermediate,ldap://directory.mockcompany.ch/cn=intermediate-ca
+            # other_sans: 1.2.840.113549.1.9.1;UTF8:ca-admin@mockcompany.ch,1.2.840.113549.1.9.1;UTF8:ca-admin@mockcompany.ch
+            # ttl: 315360000 #in seconds
+            key_type: ec 
+            key_bits: 384
+            add_basic_constraints: true
+            max_path_length: 2
+            key_usage: 
+                - DigitalSignature
+                # - ContentCommitment
+                # - KeyEncipherment
+                # - DataEncipherment
+                # - KeyAgreement
+                - CertSign
+                - CRLSign
+                # - EncipherOnly
+                # - DecipherOnly
+            # permitted_dns_domains: permitteddomain1,permitteddomain2,permitteddomain3
+            # excluded_dns_domains: excludeddomain1,excludeddomain2
+            # permitted_ip_ranges: 192.0.2.0/24,192.0.2.1/24
+            # excluded_ip_ranges: 192.0.2.2/24,192.0.2.3/24
+            # permitted_email_addresses: permitted@email.com
+            # excluded_email_addresses: excluded@email.com
+            # permitted_uri_domains: permitteduridomain1
+            # excluded_uri_domains: excludeduridomain1
+            # ou: "OUOUOUO" 
+            organization: "mockcompanySecurity"  
+            # country: "Country"  
+            # locality: "Locality" 
+            # province: "Province"  
+            # street_address: "Street Addy" 
+            # postal_code: "1919191" 
+            not_before_duration: 5m
+            not_after: "2035-12-31T23:59:59Z" # Always UTC format expected.
+
+
+    # revocation:
+    #   - issuer_mount_path_name: mockcompany-pki-root
+    #     serial_number: ""

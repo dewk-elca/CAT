@@ -1,0 +1,60 @@
+services:
+  vault:
+    image: hashicorp/vault:1.19.5
+    container_name: vault
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault_data:/vault/vault_data
+      - ./config-vault:/vault/config-vault
+    environment:
+      - TZ=Europe/Zurich
+    # command: sh -c "chown -R vault:vault /vault/vault_data && vault server --config=/vault/config-vault/vault-config.hcl" #Windows.
+    command: sh -c "vault server --config=/vault/config-vault/vault-config.hcl" #Laptop.
+
+  cups:
+    image: elca-cups
+    build:
+      context: ./cups
+      target: hp
+    # --- For Physical Printers (HP/Brother) ---
+    privileged: true
+    environment:
+      - TZ=Europe/Zurich
+    volumes:
+      - /dev:/dev
+      # - ./output/cups-pdf:/home/remroot/PDF
+
+  elca-vault-pki:
+    build: .
+    image: elca-vault-pki
+    container_name: elca-vault-pki
+    stdin_open: true 
+    tty: true
+    privileged: true
+    volumes:
+      - /dev:/dev
+      - /sys:/sys
+      - /media:/media:rshared
+      - /run/udev:/run/udev
+      - ./docker-compose.yml:/vault/docker-compose.yml
+      - ./scripts:/vault/scripts
+      - ./config:/vault/config
+      - ./config-vault:/vault/config-vault
+      - ./output:/vault/output
+      - ./input:/vault/input
+      - ./src:/vault/src
+      - ./vault_data:/vault/vault_data
+      - /home/user/.bash_history:/tmp/.bash_history
+    devices:
+      - /dev/bus/usb:/dev/bus/usb
+      - /dev/video0:/dev/video0
+    environment:
+      - VAULT_ADDR=http://vault:8200
+      - CEREM_CONFIG=/vault/config/test-revocation.yml
+      - TZ=Europe/Zurich
+      # - ENVIRONMENT=develop
+    depends_on:
+      - vault
+    entrypoint: python3 src/main.py
+    restart: "no"

@@ -1,0 +1,11 @@
+*.pem
+*.key
+vault_data/*
+output
+**/__pycache__/
+*.tar
+.venv
+*.tar.gz
+*.sha256
+input/
+**checkphrase**
